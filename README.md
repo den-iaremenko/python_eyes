@@ -1,10 +1,6 @@
 Python Eye
 ====================
 
-[![PyPI version](https://badge.fury.io/py/Appium-Python-Client.svg)](https://badge.fury.io/py/Appium-Python-Client)
-[![Downloads](https://pepy.tech/badge/appium-python-client)](https://pepy.tech/project/appium-python-client)
-[![Build Status](https://travis-ci.org/appium/python-client.svg?branch=master)](https://travis-ci.org/appium/python-client)
-
 Python package for Automation to compare expected UI on page or Mobile app screen with actual screen.
 
 # Notice

@@ -12,8 +12,15 @@ setup(
     long_description=io.open(os.path.join(os.path.dirname("__file__"), "README.md"), encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     license="MIT",
-    url="",
+    url="https://github.com/den-iaremenko/python_eye",
     packages=find_packages(),
+    project_urls={
+        'Documentation': 'https://github.com/den-iaremenko/python_eye',
+        'Funding': 'https://github.com/den-iaremenko/python_eye',
+        'Say Thanks!': 'https://github.com/den-iaremenko/python_eye',
+        'Source': 'https://github.com/den-iaremenko/python_eye',
+        'Tracker': 'https://github.com/den-iaremenko/python_eye/issues',
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python",

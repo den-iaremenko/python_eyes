@@ -27,8 +27,9 @@ class PythonEye:
         self.expected_image_name: str = expected
         expected = cv2.imread(f"{self.expected_dir}/{expected}")
         actual = cv2.imread(actual)
-        assert expected is not None, "Expected is not found"
+        assert expected is not None, "Expected image is not found"
         assert actual is not None, "Actual image is not found"
+        assert expected.shape == actual.shape, "Width or Height of the images are not the same"
 
         # compute difference
         difference = cv2.subtract(expected, actual)
@@ -88,13 +89,6 @@ class PythonEye:
         return path_to_img
 
     def verify_screen(self, expected: str, timeout: int = 3, hard_assert: bool = False) -> bool:
-        """
-
-        :param expected: episode_name
-        :param timeout: how long to wait
-        :param hard_assert: assert or warning
-        :return:
-        """
         pass
 
 
