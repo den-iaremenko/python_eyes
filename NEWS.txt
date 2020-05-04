@@ -1,0 +1,9 @@
+News
+====
+
+0.0.1_beta
+---
+
+*Release date: UNRELEASED*
+
+* Initial beta version
