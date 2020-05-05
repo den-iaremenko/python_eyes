@@ -1,1 +1,1 @@
-import python_eye
+from python_eye.python_eye import PythonEye

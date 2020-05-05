@@ -1,5 +1,8 @@
-Python Eye
-====================
+#Python Eye
+
+[![PyPI version](https://badge.fury.io/py/python-eye.svg)](https://badge.fury.io/py/python-eye)
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
+[![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
 Python package for Automation to compare expected UI on page or Mobile app screen with actual screen.
 
@@ -44,7 +47,11 @@ $ pytest -n 2 test/unit
 # Usage
 
 ```python
-from python_eye.python_eye import PythonEye
+from python_eye import PythonEye
+
+
+eye = PythonEye(driver, "screenshots", "results")
+eye.find_difference("screenshot.png")
 ```
 
 # Build & Release 

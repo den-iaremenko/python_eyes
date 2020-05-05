@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python_eye",
-    version="0.0.2",
+    version="0.0.6",
     author="Denys Iaremenko",
     author_email="denysiaremenko@gmail.com",
     description="A package for Automation that compare two images and return if there is a difference between them",
