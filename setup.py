@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python_eye",
-    version="0.0.1dev1",
+    version="0.0.2",
     author="Denys Iaremenko",
     author_email="denysiaremenko@gmail.com",
     description="A package for Automation that compare two images and return if there is a difference between them",
@@ -45,8 +45,7 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "opencv-python==4.2.0.34",
-        "pytest==5.4.1",
-        "loguru==0.4.1",
+        "opencv-python>=4.2.0.34",
+        "loguru>=0.4.1",
     ]
 )
