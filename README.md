@@ -2,7 +2,6 @@
 
 [![PyPI version](https://badge.fury.io/py/python-eye.svg)](https://badge.fury.io/py/python-eye)
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
-[![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
 Python package for Automation to compare expected UI on page or Mobile app screen with actual screen.
 
