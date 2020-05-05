@@ -9,6 +9,7 @@ verify_ssl = true
 opencv-python = "*"
 pytest = "*"
 loguru = "*"
+python-eye = {index = "https://test.pypi.org/simple/",version = "*"}
 
 [requires]
 python_version = "3.8"

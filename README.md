@@ -51,3 +51,11 @@ $ pytest -n 2 test/unit
 ```python
 from python_eye import PythonEye
 ```
+
+### Release 
+
+```bash
+sudo python3.8 setup.py sdist bdist_wheel
+
+twine upload --repository-url https://test.pypi.org/legacy/ dist/* --skip-existing --verbose
+```
