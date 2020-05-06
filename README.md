@@ -1,6 +1,5 @@
 ![Logo](python_eyes_logo.jpeg)
 
-
 #Python Eyes
 
 [![PyPI version](https://badge.fury.io/py/python-eyes.svg)](https://badge.fury.io/py/python-eyes)
@@ -17,7 +16,7 @@ Python package for Automation to compare expected UI on page or Mobile app scree
 1. Install from [PyPi](https://pypi.org), as
 ['python_eyes'](https://pypi.org/project/python-eyes/).
 
-```shell
+```bash
 pip install python_eyes
 ```
 
@@ -29,21 +28,8 @@ pip install python_eyes
 
 # Run tests
 
-
-```
-$ pytest
-```
-
-You also can run particular tests like below.
-
-```
-$ pytest test/unit
-```
-
-Run with `pytest-xdist`
-
-```
-$ pytest -n 2 test/unit
+```bash
+$ pipenv run pytest
 ```
 
 # Usage
@@ -56,10 +42,3 @@ eyes = PythonEyes(driver, "screenshots", "results")
 eyes.find_difference("screenshot.png")
 ```
 
-# Build & Release 
-
-```bash
-sudo python3.8 setup.py sdist bdist_wheel
-
-twine upload --repository pypi dist/*
-```
