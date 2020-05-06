@@ -1,4 +1,4 @@
-![Logo](https://drive.google.com/open?id=1FmE9jmJAv5rx8ltqQJVSN4hSsHZopMsH)
+![Logo](https://drive.google.com/file/d/1FmE9jmJAv5rx8ltqQJVSN4hSsHZopMsH/view?usp=sharing)
 
 
 #Python Eye
