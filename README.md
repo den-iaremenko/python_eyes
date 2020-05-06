@@ -1,8 +1,7 @@
-![Logo](python_eyes_logo.jpeg)
-
-
 #Python Eyes
 
+![Logo](python_eyes_logo.jpeg)
+***
 [![PyPI version](https://badge.fury.io/py/python-eyes.svg)](https://badge.fury.io/py/python-eyes)
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
