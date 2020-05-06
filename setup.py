@@ -4,8 +4,8 @@ import os
 from setuptools import setup, find_packages
 
 setup(
-    name="python_eye",
-    version="0.0.6",
+    name="python_eyes",
+    version="0.0.1",
     author="Denys Iaremenko",
     author_email="denysiaremenko@gmail.com",
     description="A package for Automation that compare two images and return if there is a difference between them",

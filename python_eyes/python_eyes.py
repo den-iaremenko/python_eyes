@@ -6,7 +6,7 @@ from time import time
 from os import path, listdir, mkdir
 
 
-class PythonEye:
+class PythonEyes:
 
     def __init__(self, driver, expected_images_dir: str, path_to_result_images: str):
         self.driver = driver
