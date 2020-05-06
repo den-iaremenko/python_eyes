@@ -1,3 +1,6 @@
+![Logo](https://drive.google.com/open?id=1FmE9jmJAv5rx8ltqQJVSN4hSsHZopMsH)
+
+
 #Python Eye
 
 [![PyPI version](https://badge.fury.io/py/python-eyes.svg)](https://badge.fury.io/py/python-eyes)
@@ -12,7 +15,7 @@ Python package for Automation to compare expected UI on page or Mobile app scree
 # Getting the Python Eye
 
 1. Install from [PyPi](https://pypi.org), as
-['python_eye'](https://pypi.org/project/python-eyes/).
+['python_eyes'](https://pypi.org/project/python-eyes/).
 
 ```shell
 pip install python_eyes
