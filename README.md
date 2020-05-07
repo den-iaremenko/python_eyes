@@ -38,6 +38,6 @@ from python_eyes import PythonEyes
 
 
 eyes = PythonEyes(driver, "screenshots", "results")
-eyes.find_difference("screenshot.png")
+eyes.verify_screen("screenshot.png", hard_assert=False, timeout=2)
 ```
 

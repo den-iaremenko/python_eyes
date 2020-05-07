@@ -132,7 +132,7 @@ class PythonEyes:
         cv2.imwrite(path_to_img, im_v)
         return path_to_img
 
-    def verify_screen(self, expected: str, hard_assert: bool = False, timeout: int = 3) -> None:
+    def verify_screen(self, expected: str, hard_assert: bool = True, timeout: int = 3) -> None:
         """
         Screen state verification functionality
 
