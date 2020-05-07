@@ -1,9 +1,18 @@
 News
 ====
 
-0.0.1_beta
+0.0.2
 ---
 
-*Release date: UNRELEASED*
+New method is added: verify_screen with timeout and hard_assert option
+
+*Release date: 07.05.2020*
+
+
+0.0.1_beta
+---
+Initial release with mvp functionality
+
+*Release date: 05.05.2020*
 
 * Initial beta version

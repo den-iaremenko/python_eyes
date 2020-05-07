@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python_eyes",
-    version="0.0.1",
+    version="0.0.2",
     author="Denys Iaremenko",
     author_email="denysiaremenko@gmail.com",
     description="A package for Automation that compare two images and return if there is a difference between them",
@@ -22,12 +22,13 @@ setup(
         'Tracker': 'https://github.com/den-iaremenko/python_eye/issues',
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Environment :: Console",
         "Environment :: MacOS X",
+        "Environment :: Linux",
         "Intended Audience :: Developers",
         "Intended Audience :: Other Audience",
         "License :: OSI Approved :: MIT License",
