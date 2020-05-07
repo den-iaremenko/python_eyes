@@ -10,6 +10,7 @@ opencv-python = "*"
 pytest = "*"
 loguru = "*"
 python-eye = {index = "https://test.pypi.org/simple/",version = "*"}
+pylint = "*"
 
 [requires]
 python_version = "3.8"

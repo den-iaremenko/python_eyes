@@ -38,6 +38,7 @@ from python_eyes import PythonEyes
 
 
 eyes = PythonEyes(driver, "screenshots", "results")
-eyes.verify_screen("screenshot.png", hard_assert=False, timeout=2)
+eyes.verify_screen("login_page_no_text.png")
+eyes.verify_screen("login_page_error.png", hard_assert=False, timeout=2)
 ```
 
