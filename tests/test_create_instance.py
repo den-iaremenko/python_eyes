@@ -1,6 +1,6 @@
-from python_eye import PythonEye
+from python_eyes import PythonEyes
 
 
 def test_create_python_eye():
-    p_e = PythonEye("test", "test", "test")
-    assert isinstance(p_e, PythonEye), "Instance is not created"
+    p_e = PythonEyes("test", "test", "test")
+    assert isinstance(p_e, PythonEyes), "Instance is not created"
