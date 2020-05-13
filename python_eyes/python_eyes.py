@@ -1,3 +1,4 @@
+from datetime import datetime
 from time import time
 from os import path, mkdir
 from loguru import logger
@@ -15,7 +16,8 @@ class PythonEyes:
     def __init__(self, driver,
                  expected_images_dir: str,
                  path_to_result_images: str,
-                 logs_enable: bool = False):
+                 logs_enable: bool = False,
+                 is_appium: bool = False):
         """
         Init for  PythonEyes class
 
@@ -23,13 +25,16 @@ class PythonEyes:
         :param expected_images_dir: str folder for all Images for expected result
         :param path_to_result_images: str folder for all Images with difference
         :param logs_enable: bool ON/OFF logs
+        :param is_appium: bool Driver is appium
         """
         self.driver = driver
         self.expected_dir = expected_images_dir
         self.path_to_result_images = path_to_result_images
         self.logs_enable = logs_enable
+        self.is_appium = is_appium
         self.expected_image_name = None
         self.path_to_image_with_difference = None
+        self.image_with_difference = None
         self.image_id = None
         self._set_up()
 
@@ -62,6 +67,19 @@ class PythonEyes:
         if self.logs_enable:
             logger.info(msg)
 
+    def _image_resize(self, img: numpy.ndarray) -> numpy.ndarray:
+        img_h, img_w, _ = img.shape
+        if self.is_appium:
+            all_system_bars = self.driver.get_system_bars()
+            status_bar = all_system_bars.get("statusBar")
+            nav_bar = all_system_bars.get("navigationBar")
+            if status_bar and status_bar.get("visible"):
+                img = img[status_bar.get("height"):, :]
+            if nav_bar and nav_bar.get("visible"):
+                y_value = nav_bar.get("y") - status_bar.get("height")
+                img = img[:y_value, :]
+        return img
+
     def _find_difference(self, screen_state: str) -> bool:
         """
         This function is created to find a difference between two images
@@ -69,11 +87,13 @@ class PythonEyes:
         :param screen_state: str path to template image
         :return: bool images different or not
         """
+
         # saving screen state name
         self.expected_image_name: str = screen_state
         # taking a screen shot to get a screen size
         self.driver.save_screenshot("tmp/screen.png")
         temp_img = cv2.imread("tmp/screen.png")
+        temp_img = self._image_resize(temp_img)
         img_h, img_w, _ = temp_img.shape
         # creating paths
         expected_img_path = f"{self.expected_dir}/{screen_state.split('.')[0]}_{img_h}_{img_w}.png"
@@ -84,8 +104,9 @@ class PythonEyes:
         self._info(f"Actual result path: {actual_img_path}")
         # loading images
         actual = cv2.imread(actual_img_path)
+        actual = self._image_resize(actual)
         if not path.exists(expected_img_path):
-            self.driver.save_screenshot(expected_img_path)
+            cv2.imwrite(expected_img_path, actual)
             logger.warning(f"Image {expected_img_path} is not found. Saving current screenshot")
         screen_state = cv2.imread(expected_img_path)
         # checking that shape is same
@@ -101,25 +122,34 @@ class PythonEyes:
         # calculating difference
         total_pixels = screen_state.shape[0] * screen_state.shape[1]
         percent_of_dif = float(cv2.countNonZero(conv_hsv_gray) * 100 / total_pixels)
-        self._info(f"Different: {percent_of_dif:.2f}%")
+        self._info(f"Different: {percent_of_dif:.5f}%")
         is_different = percent_of_dif > 0.0002
+        self._info(f"IS_DIFFERENT == {is_different}")
         # saving image with difference
         if is_different:
-            self._info("Expected image and Actual screen shot are not the same")
-            self._info("Creating an image for report")
             actual[mask != 255] = red_color
-            self.path_to_image_with_difference = self._create_report_image(screen_state, actual)
-            self._info(self.path_to_image_with_difference)
+            self._create_report_image(screen_state, actual)
         else:
             self._info("Images are same")
         return is_different
+
+    def _save_image_with_difference(self) -> None:
+        """
+        Functionality to save image with difference
+
+        :return: None
+        """
+        self._info(f"Saving image with difference."
+                   f" Path: {self.path_to_image_with_difference}")
+        cv2.imwrite(self.path_to_image_with_difference, self.image_with_difference)
 
     @staticmethod
     def _calculate_text_coordinates(image_h: int, image_w: int) -> list:
         """
         Functionality to calculate text coordinates
 
-        :param image_shape: tuple of shape (h, w, _)
+        :param image_h: int height of the screen
+        :param image_w: int width of the screen
         :return: list of coordinates to place text
         """
         total_w = 2 * image_w
@@ -128,56 +158,91 @@ class PythonEyes:
         y_2 = int(total_w * 0.73)
         return [(y_1, text_x_location), (y_2, text_x_location)]
 
-    def _create_report_image(self, expected: numpy.ndarray, actual: numpy.ndarray) -> str:
+    @staticmethod
+    def _write_text(img: numpy.ndarray, text: str,
+                    coordinates: tuple, font_size: int = 2) -> None:
+        """
+        Functionality to write text on images
+
+        :param img: ndarray image to modify
+        :param text: str text to write
+        :param coordinates: tuple coordinates for text
+        :param font_size: int font size
+        :return:
+        """
+        cv2.putText(img, text,
+                    coordinates,
+                    FONT, font_size,
+                    white_color, 2,
+                    cv2.LINE_AA)
+
+    @staticmethod
+    def _get_current_date_as_str(type_of_format: int = 0) -> str:
+        """
+        Functionality to get a datetime.now() as a string in needed format
+
+        :param type_of_format: int type of format to return
+        :return: str datetime.now() in needed format
+        """
+        now = datetime.now()
+        if type_of_format == 1:
+            return f"{now.day}_{now.month}_{now.year}_{now.hour}_{now.minute}_{now.second}"
+        else:
+            return f"{now.day}.{now.month}.{now.year} {now.hour}:{now.minute}:{now.second}"
+
+    def _create_report_image(self, expected: numpy.ndarray, actual: numpy.ndarray) -> None:
         """
         Creating one image from Expected and Actual screenshots
 
         :param expected: ndarray
         :param actual:  ndarray
-        :return: path to new created image
         """
         # creating new path for image with difference
-        path_to_img = f"{self.path_to_result_images}/" \
-                      f"{self.expected_image_name.split('.')[0]}_{self.image_id}.png"
+        self.path_to_image_with_difference = f"{self.path_to_result_images}/" \
+                                             f"{self.expected_image_name.split('.')[0]}" \
+                                             f"_{self.image_id}.png"
         # adding a border to visually separate to images
-        expected = cv2.copyMakeBorder(expected, 0, 0, 0, 10, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+        size_of_line_between_images = 5
+        expected = cv2.copyMakeBorder(expected, 0, 0, 0,
+                                      size_of_line_between_images,
+                                      cv2.BORDER_CONSTANT, value=(0, 0, 0))
         im_v = cv2.hconcat([expected, actual])
         # adding border for text
-        im_v = cv2.copyMakeBorder(im_v, 0, 100, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+        im_v = cv2.copyMakeBorder(im_v, 0, 220, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
         # calculating coordinates for text
         text_coordinates = self._calculate_text_coordinates(expected.shape[0], expected.shape[1])
+        # creating date text and calculating coordinates
+        date_text = self._get_current_date_as_str()
+        info_text_coordinates = (10, expected.shape[0] + 120)
+        image_name_coordinates = (10, expected.shape[0] + 160)
+        date_text_coordinates = (10, expected.shape[0] + 200)
         # adding text
-        cv2.putText(im_v, "Expected",
-                    text_coordinates[0],
-                    FONT, 2,
-                    white_color, 2,
-                    cv2.LINE_AA)
-        cv2.putText(im_v, "Actual",
-                    text_coordinates[1],
-                    FONT, 2,
-                    white_color, 2,
-                    cv2.LINE_AA)
-        # saving image
-        cv2.imwrite(path_to_img, im_v)
-        return path_to_img
+        self._write_text(im_v, "Expected", text_coordinates[0])
+        self._write_text(im_v, "Actual", text_coordinates[1])
+        self._write_text(im_v, "Image info: ", info_text_coordinates, font_size=1)
+        self._write_text(im_v, f"{self.expected_image_name}",
+                         image_name_coordinates, font_size=1)
+        self._write_text(im_v, f"{date_text}", date_text_coordinates, font_size=1)
+        self.image_with_difference = im_v
 
     def verify_screen(self, expected: str, hard_assert: bool = True, timeout: int = 2) -> None:
         """
         Screen state verification functionality
 
         :param expected: str Screen state name
-        :param timeout: int wait for loading to override default timeout
         :param hard_assert: bool raise AssertionError or just display a error message
+        :param timeout: int wait for loading to override default timeout
         :return: None
         """
         different = False
-        self.image_id = int(time())
+        self.image_id = self._get_current_date_as_str(1)
         timeout = int(time()) + timeout
         while int(time()) <= timeout:
             different = self._find_difference(expected)
             if not different:
                 break
         else:
+            self._save_image_with_difference()
             error_message = f"Expected and Actual images are different for " \
                             f"{self.expected_image_name}" \
                             f"Image to check difference: {self.path_to_image_with_difference}"

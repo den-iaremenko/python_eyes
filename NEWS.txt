@@ -1,6 +1,13 @@
 News
 ====
 
+0.0.3
+---
+
+Minor changes and code clean up
+
+*Release date: 07.05.2020*
+
 0.0.2
 ---
 
