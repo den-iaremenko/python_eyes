@@ -8,6 +8,7 @@ import numpy
 
 white_color = (255, 255, 255)
 red_color = (0, 0, 255)
+blue_color = (205, 0, 0)
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -68,7 +69,6 @@ class PythonEyes:
             logger.info(msg)
 
     def _image_resize(self, img: numpy.ndarray) -> numpy.ndarray:
-        img_h, img_w, _ = img.shape
         if self.is_appium:
             all_system_bars = self.driver.get_system_bars()
             status_bar = all_system_bars.get("statusBar")
@@ -79,6 +79,24 @@ class PythonEyes:
                 y_value = nav_bar.get("y") - status_bar.get("height")
                 img = img[:y_value, :]
         return img
+
+    def _expected_image_path(self, screen_name: str, img_h: int, img_w: int) -> str:
+        """
+        Functionality to generate expected result path based on
+        image name, size and platform
+
+        :param screen_name: str image name
+        :param img_h: int image height
+        :param img_w: int image width
+        :return: str path for expected image
+        """
+        if self.is_appium:
+            platform_name = self.driver.desired_capabilities.get("platformName").lower()
+            return f"{self.expected_dir}/" \
+                   f"{screen_name.split('.')[0]}_" \
+                   f"{platform_name}_{img_h}_{img_w}.png"
+        return f"{self.expected_dir}/" \
+               f"{screen_name.split('.')[0]}_{img_h}_{img_w}.png"
 
     def _find_difference(self, screen_state: str) -> bool:
         """
@@ -96,7 +114,7 @@ class PythonEyes:
         temp_img = self._image_resize(temp_img)
         img_h, img_w, _ = temp_img.shape
         # creating paths
-        expected_img_path = f"{self.expected_dir}/{screen_state.split('.')[0]}_{img_h}_{img_w}.png"
+        expected_img_path = self._expected_image_path(screen_state, img_h, img_w)
         actual_img_path = f"tmp/{screen_state.split('.')[0]}_{img_h}_{img_w}.png"
         # saving screenshot
         self.driver.save_screenshot(actual_img_path)
@@ -113,21 +131,30 @@ class PythonEyes:
         assert screen_state.shape == actual.shape, "Width or Height of the images are not the same"
         # compute difference
         difference = cv2.subtract(screen_state, actual)
+        difference_2 = cv2.subtract(actual, screen_state)
         # color the mask red
         conv_hsv_gray = cv2.cvtColor(difference, cv2.COLOR_BGR2GRAY)
+        conv_hsv_gray_2 = cv2.cvtColor(difference_2, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite("1.png", conv_hsv_gray)
+        cv2.imwrite("2.png", conv_hsv_gray_2)
+
         # add contrast to image
         # THIS ONE IS VERY IMPORTANT NOT TO LOSE ALL DIFFERENCE
         conv_hsv_gray[conv_hsv_gray != 0] = 255
+        conv_hsv_gray_2[conv_hsv_gray_2 != 0] = 255
         mask = cv2.threshold(conv_hsv_gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        mask_2 = cv2.threshold(conv_hsv_gray_2, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
         # calculating difference
         total_pixels = screen_state.shape[0] * screen_state.shape[1]
-        percent_of_dif = float(cv2.countNonZero(conv_hsv_gray) * 100 / total_pixels)
+        amount_of_different_px = cv2.countNonZero(conv_hsv_gray) + cv2.countNonZero(conv_hsv_gray_2)
+        percent_of_dif = float(amount_of_different_px * 100 / total_pixels)
         self._info(f"Different: {percent_of_dif:.5f}%")
         is_different = percent_of_dif > 0.0002
         self._info(f"IS_DIFFERENT == {is_different}")
         # saving image with difference
         if is_different:
             actual[mask != 255] = red_color
+            actual[mask_2 != 255] = blue_color
             self._create_report_image(screen_state, actual)
         else:
             self._info("Images are same")
@@ -187,8 +214,7 @@ class PythonEyes:
         now = datetime.now()
         if type_of_format == 1:
             return f"{now.day}_{now.month}_{now.year}_{now.hour}_{now.minute}_{now.second}"
-        else:
-            return f"{now.day}.{now.month}.{now.year} {now.hour}:{now.minute}:{now.second}"
+        return f"{now.day}.{now.month}.{now.year} {now.hour}:{now.minute}:{now.second}"
 
     def _create_report_image(self, expected: numpy.ndarray, actual: numpy.ndarray) -> None:
         """
@@ -212,10 +238,17 @@ class PythonEyes:
         # calculating coordinates for text
         text_coordinates = self._calculate_text_coordinates(expected.shape[0], expected.shape[1])
         # creating date text and calculating coordinates
+        image_h, image_w, _ = expected.shape
         date_text = self._get_current_date_as_str()
-        info_text_coordinates = (10, expected.shape[0] + 120)
-        image_name_coordinates = (10, expected.shape[0] + 160)
-        date_text_coordinates = (10, expected.shape[0] + 200)
+        info_text_coordinates = (10, image_h + 120)
+        blue_description = (int(image_w * 1.22), image_h + 160)
+        red_description = (int(image_w * 1.22), image_h + 200)
+        blue_line_start = (int(image_w * 1.1), image_h + 150)
+        blue_line_end = (int(image_w * 1.2), image_h + 150)
+        red_line_start = (int(image_w * 1.1), image_h + 190)
+        red_line_end = (int(image_w * 1.2), image_h + 190)
+        image_name_coordinates = (10, image_h + 160)
+        date_text_coordinates = (10, image_h + 200)
         # adding text
         self._write_text(im_v, "Expected", text_coordinates[0])
         self._write_text(im_v, "Actual", text_coordinates[1])
@@ -223,6 +256,10 @@ class PythonEyes:
         self._write_text(im_v, f"{self.expected_image_name}",
                          image_name_coordinates, font_size=1)
         self._write_text(im_v, f"{date_text}", date_text_coordinates, font_size=1)
+        self._write_text(im_v, "Expected has and not on Actual", blue_description, font_size=1)
+        self._write_text(im_v, "Actual has and not on Expected", red_description, font_size=1)
+        cv2.line(im_v, blue_line_start, blue_line_end, blue_color, 15)
+        cv2.line(im_v, red_line_start, red_line_end, red_color, 15)
         self.image_with_difference = im_v
 
     def verify_screen(self, expected: str, hard_assert: bool = True, timeout: int = 2) -> None:
