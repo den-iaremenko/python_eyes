@@ -1,6 +1,13 @@
 News
 ====
 
+0.0.4
+---
+
+Support for Android and improvements for report image
+
+*Release date: in progress*
+
 0.0.3
 ---
 
