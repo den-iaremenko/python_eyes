@@ -1,4 +1,4 @@
-![Logo](python_eyes_logo.jpeg)
+![Logo](https://raw.githubusercontent.com/den-iaremenko/python_eyes/master/python_eyes_logo.jpeg)
 
 
 # Python Eyes
